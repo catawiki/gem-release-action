@@ -1,0 +1,34 @@
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+name: Release Gem to GitHub Packages
+description: >-
+  Bump version based on PR labels, create a new tag, build and publish Ruby gem
+  to GitHub Packages.
+
+  Only labels named "version:major", "version:minor" and "version:patch" will
+  result in new release.
+author: Gergo Sulymosi
+branding:
+  color: green
+  icon: upload-cloud
+inputs:
+  github_packages_owner:
+    description: >-
+      The name of the GitHub Packages organisation. The gem will be published
+      under the organisation.
+    required: true
+  github_packages_token:
+    description: >-
+      Personal access token (PAT) used to push the gem to the repository.
+
+      We recommend using a service account with the least permissions necessary.
+      Also when generating a new PAT, select the least scopes necessary.
+    default: ${{ github.token }}
+  pr_labels:
+    description: >-
+      A list of labels, separated by "|" that triggers a specific version bump.
+      The recognised labels are "version:patch", "version:minor" and
+      "version:major".
+    default: ${{ join(github.event.pull_request.labels.*.name, '|') }}
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
